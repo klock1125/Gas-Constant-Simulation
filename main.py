@@ -3,14 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.widgets import Slider, Button
 
-## TO DO:
-# initialize fig 2 (scatter plot)
-# create a "plot" button on fig 1
-# if "plot" clicked, plot point on fig 2
-
 # constants
 KB = 1.380649 * 10**-23
-SPEED_ADJUSTMENT = 25000000 # increase to slow down simulation
+SPEED_ADJUSTMENT = 2500000 # increase to slow down simulation
 
 # 3D plot (particle simulation)
 fig = plt.figure()
@@ -18,7 +13,7 @@ ax = fig.add_subplot(121, projection='3d')
 ax.tick_params(labelsize=7)
 
 pressure_display = plt.figtext(0.98, 0.98, "Average pressure (atm): ", va="top", ha="right")
-R_display = plt.figtext(0.98, 0.94, "Calculated gas constant: ", va="top", ha="right")
+R_display = plt.figtext(0.98, 0.94, "Calculated R (L atm mol\u207b\u00b9 K\u207b\u00b9): ", va="top", ha="right")
 
 # sliders referenced from: https://www.geeksforgeeks.org/python/matplotlib-slider-widget/
 # number of particles
@@ -56,14 +51,14 @@ def initialize(val):
     ax.clear()
     
     # variables
-    n = n_slider.val
-    t = t_slider.val
-    molar_mass = mm_slider.val * SPEED_ADJUSTMENT
+    n = n_slider.val # number of particles
+    t = t_slider.val # temperature (Kelvin)
+    molar_mass = mm_slider.val * SPEED_ADJUSTMENT # molar mass (g/mol)
     m = (molar_mass / 1000) / (6.022 * 10**23) # mass of particle (kg)
-    volume = v_slider.val
-    wall = (volume / 1000) ** (1/3)
+    volume = v_slider.val # volume (Liters)
+    wall = (volume / 1000) ** (1/3) # length of axes (meters)
 
-    color = (red_slider.val / 255, green_slider.val / 255, blue_slider.val / 255)
+    color = (red_slider.val / 255, green_slider.val / 255, blue_slider.val / 255) # RGB
 
 
     # plot particles
@@ -131,17 +126,20 @@ def update(frame):
     r = average_pressure * volume / (moles * curr_temp)
 
     pressure_display.set_text("Average pressure (atm): " + str(format(average_pressure, ".2e")))
-    R_display.set_text("Calculated R: " + str(format(r, ".4")))
+    R_display.set_text("Calculated R (L atm mol\u207b\u00b9 K\u207b\u00b9): " + str(format(r, ".4")))
     return points,
 
-#2D graph
-slope_display = plt.figtext(0.98, 0.90, "Slope: ", va="top", ha="right")
+# 2D graph
+slope_display = plt.figtext(0.97, 0.75, "Slope: ", va="top", ha="right")
 graph_ax = fig.add_subplot(122)
+graph_ax.set_title("LSRL Graph: R = PV / nT")
+graph_ax.set_xlabel("nT")
+graph_ax.set_ylabel("PV")
 plot_button = Button(fig.add_axes([0.9, 0.05, 0.1, 0.075]), 'plot')
 line, = graph_ax.plot([], [], color='red', label='LSRL')
 x = np.array([]) # nT
 y = np.array([]) # PV
-
+# plotting the data points and LSRL
 def plot_point(val):
     global x, y
     x = np.append(x, moles * t)
@@ -161,7 +159,7 @@ fig.tight_layout(pad=4.0)
 fig.set_size_inches(4, 3)
 plt.subplots_adjust(bottom=0.25, wspace=0.5, hspace=0.5)
 ax.set_position([0.05, 0.25, 0.7, 0.7])
-graph_ax.set_position([0.7, 0.5, 0.2, 0.3])
+graph_ax.set_position([0.67, 0.5, 0.2, 0.3])
 
 
 # running
@@ -173,7 +171,7 @@ mm_slider.on_changed(initialize)
 red_slider.on_changed(change_color)
 green_slider.on_changed(change_color)
 blue_slider.on_changed(change_color)
-ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
+ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=10)
 plot_button.on_clicked(plot_point)
 
 plt.show()
