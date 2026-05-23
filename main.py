@@ -3,19 +3,17 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.widgets import Slider, Button
 
-# constants
 KB = 1.380649 * 10**-23
 SPEED_ADJUSTMENT = 2500000 # increase to slow down simulation
 
 # 3D plot (particle simulation)
 fig = plt.figure()
-ax = fig.add_subplot(121, projection='3d')
+ax = fig.add_subplot(projection='3d')
 ax.tick_params(labelsize=7)
 
 pressure_display = plt.figtext(0.98, 0.98, "Average pressure (atm): ", va="top", ha="right")
 R_display = plt.figtext(0.98, 0.94, "Calculated R (L atm mol\u207b\u00b9 K\u207b\u00b9): ", va="top", ha="right")
 
-# sliders referenced from: https://www.geeksforgeeks.org/python/matplotlib-slider-widget/
 # number of particles
 n_slider = Slider(ax=fig.add_axes([0.25, 0.18, 0.5, 0.025]), label='Number of particles', valmin = 5, valmax = 1000, valinit=300, valstep=1)
 n = n_slider.val
@@ -73,8 +71,7 @@ def initialize(val):
 
     # zeroing momentum
     avg_vel = np.array([np.sum(vel[:,0]), np.sum(vel[:,1]), np.sum(vel[:,2])]) / n
-    for i in range(len(vel)):
-            vel[i] = vel[i] - avg_vel
+    vel -= avg_vel
 
     # temperature rescaling
     mean_square_v = np.sum(vel ** 2) / n
